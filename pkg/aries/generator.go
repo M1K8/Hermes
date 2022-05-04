@@ -319,6 +319,7 @@ func ParseOptions(opts string) ([]string, error) {
 	resArr := make([]string, 0)
 
 	for _, v := range res {
+		v = strings.TrimSpace(v)
 		opt, err := ParseOption(v)
 		if err != nil {
 			return nil, err
