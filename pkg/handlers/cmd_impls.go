@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/m1k8/hermes/pkg/aries"
@@ -34,7 +35,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					lpFl, err = strconv.ParseFloat(lp, 64)
 					if err != nil {
 						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-							Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
 							},
@@ -52,10 +53,10 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				}
 			}
 
-			res, err := gen.GetStockUrl(ticker, short, aries.ContractBuyOrSell(!close), aries.Limit, aries.OrderDuration(dur), lpFl, 0, 0, 0, 0, 0)
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Limit, aries.OrderDuration(dur), lpFl, 0, 0, 0, 0, 0)
 			if err != nil {
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
 					},
@@ -69,6 +70,868 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Content: res,
 				},
 			})
+
+		case "market":
+			var (
+				ticker string
+				close  bool
+				dur    int
+				short  bool
+				err    error
+			)
+			marketOpts := options[0].Options
+
+			for _, v := range marketOpts {
+				switch v.Name {
+				case "duration":
+					dur = int(v.IntValue())
+				case "ticker":
+					ticker = v.StringValue()
+				case "short":
+					short = v.BoolValue()
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Market, aries.OrderDuration(dur), 0.0, 0, 0, 0, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "stop-market":
+			var (
+				ticker string
+				close  bool
+				stop   string
+				sFl    float64
+				dur    int
+				short  bool
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "stop-price":
+					stop = v.StringValue()
+					sFl, err = strconv.ParseFloat(stop, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "ticker":
+					ticker = v.StringValue()
+				case "short":
+					short = v.BoolValue()
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Stop_Market, aries.OrderDuration(dur), 0, 0, sFl, 0, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "stop-limit":
+			var (
+				ticker string
+				close  bool
+				stop   string
+				sFl    float64
+				lp     string
+				lpFl   float64
+				dur    int
+				short  bool
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "limit-price":
+					lp = v.StringValue()
+					lpFl, err = strconv.ParseFloat(lp, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "stop-price":
+					stop = v.StringValue()
+					sFl, err = strconv.ParseFloat(stop, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "ticker":
+					ticker = v.StringValue()
+				case "short":
+					short = v.BoolValue()
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Stop_Limit, aries.OrderDuration(dur), lpFl, 0, sFl, 0, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "bracket":
+			var (
+				ticker string
+				close  bool
+				stop   string
+				sFl    float64
+				lp     string
+				lpFl   float64
+				p      string
+				pFl    float64
+				dur    int
+				short  bool
+				err    error
+			)
+			bracketOpts := options[0].Options
+
+			for _, v := range bracketOpts {
+				switch v.Name {
+				case "limit-price":
+					lp = v.StringValue()
+					lpFl, err = strconv.ParseFloat(lp, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "profit-limit":
+					p = v.StringValue()
+					pFl, err = strconv.ParseFloat(p, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "stop-loss":
+					stop = v.StringValue()
+					sFl, err = strconv.ParseFloat(stop, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "ticker":
+					ticker = v.StringValue()
+				case "short":
+					short = v.BoolValue()
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Bracket, aries.OrderDuration(dur), lpFl, sFl, 0, 0, 0, pFl)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "trailing-stop":
+			var (
+				ticker string
+				close  bool
+				ta     string
+				taFl   float64
+				dur    int
+				short  bool
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "trail-amount":
+					ta = v.StringValue()
+					taFl, err = strconv.ParseFloat(ta, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+
+				case "duration":
+					dur = int(v.IntValue())
+				case "ticker":
+					ticker = v.StringValue()
+				case "short":
+					short = v.BoolValue()
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Trailing_Stop, aries.OrderDuration(dur), 0, 0, 0, taFl, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "trailing-percent":
+			var (
+				ticker string
+				close  bool
+				ta     string
+				taFl   float64
+				dur    int
+				short  bool
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "trail-percent":
+					ta = v.StringValue()
+					taFl, err = strconv.ParseFloat(ta, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+
+				case "duration":
+					dur = int(v.IntValue())
+				case "ticker":
+					ticker = v.StringValue()
+				case "short":
+					short = v.BoolValue()
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Trailing_Stop_Pct, aries.OrderDuration(dur), 0, 0, 0, 0, taFl, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		}
+	},
+	"options": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		options := i.ApplicationCommandData().Options
+		gen := aries.NewAriesGenerator()
+
+		// As you can see, names of subcommands (nested, top-level)
+		// and subcommand groups are provided through the arguments.
+		switch options[0].Name {
+		case "limit":
+			var (
+				ticker string
+				close  bool
+				lp     string
+				lpFl   float64
+				dur    int
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "limit-price":
+					lp = v.StringValue()
+					lpFl, err = strconv.ParseFloat(lp, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "contract-defs":
+					ticker = v.StringValue()
+					opts, err := aries.ParseOptions(ticker)
+
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+					ticker = strings.Join(opts, ",")
+
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Limit, aries.OrderDuration(dur), lpFl, 0, 0, 0, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "market":
+			var (
+				ticker string
+				close  bool
+				dur    int
+				err    error
+			)
+			marketOpts := options[0].Options
+
+			for _, v := range marketOpts {
+				switch v.Name {
+				case "duration":
+					dur = int(v.IntValue())
+				case "contract-defs":
+					ticker = v.StringValue()
+					opts, err := aries.ParseOptions(ticker)
+
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+					ticker = strings.Join(opts, ",")
+
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Market, aries.OrderDuration(dur), 0.0, 0, 0, 0, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "stop-market":
+			var (
+				ticker string
+				close  bool
+				stop   string
+				sFl    float64
+				dur    int
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "stop-price":
+					stop = v.StringValue()
+					sFl, err = strconv.ParseFloat(stop, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "contract-defs":
+					ticker = v.StringValue()
+					opts, err := aries.ParseOptions(ticker)
+
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+					ticker = strings.Join(opts, ",")
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Stop_Market, aries.OrderDuration(dur), 0, 0, sFl, 0, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "stop-limit":
+			var (
+				ticker string
+				close  bool
+				stop   string
+				sFl    float64
+				lp     string
+				lpFl   float64
+				dur    int
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "limit-price":
+					lp = v.StringValue()
+					lpFl, err = strconv.ParseFloat(lp, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "stop-price":
+					stop = v.StringValue()
+					sFl, err = strconv.ParseFloat(stop, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "contract-defs":
+					ticker = v.StringValue()
+					opts, err := aries.ParseOptions(ticker)
+
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+					ticker = strings.Join(opts, ",")
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Stop_Limit, aries.OrderDuration(dur), lpFl, 0, sFl, 0, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "bracket":
+			var (
+				ticker string
+				close  bool
+				stop   string
+				sFl    float64
+				lp     string
+				lpFl   float64
+				p      string
+				pFl    float64
+				dur    int
+				err    error
+			)
+			bracketOpts := options[0].Options
+
+			for _, v := range bracketOpts {
+				switch v.Name {
+				case "limit-price":
+					lp = v.StringValue()
+					lpFl, err = strconv.ParseFloat(lp, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "profit-limit":
+					p = v.StringValue()
+					pFl, err = strconv.ParseFloat(p, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "stop-loss":
+					stop = v.StringValue()
+					sFl, err = strconv.ParseFloat(stop, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "contract-defs":
+					ticker = v.StringValue()
+					opts, err := aries.ParseOptions(ticker)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+
+					ticker, err = aries.ParseOption(opts[0])
+
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Bracket, aries.OrderDuration(dur), lpFl, sFl, 0, 0, 0, pFl)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "trailing-stop":
+			var (
+				ticker string
+				close  bool
+				ta     string
+				taFl   float64
+				dur    int
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "trail-amount":
+					ta = v.StringValue()
+					taFl, err = strconv.ParseFloat(ta, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+
+				case "duration":
+					dur = int(v.IntValue())
+				case "contract-defs":
+					ticker = v.StringValue()
+					opts, err := aries.ParseOptions(ticker)
+
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+					ticker = strings.Join(opts, ",")
+
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Trailing_Stop, aries.OrderDuration(dur), 0, 0, 0, taFl, 0, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
+		case "trailing-percent":
+			var (
+				ticker string
+				close  bool
+				ta     string
+				taFl   float64
+				dur    int
+				err    error
+			)
+			limitOpts := options[0].Options
+
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "trail-percent":
+					ta = v.StringValue()
+					taFl, err = strconv.ParseFloat(ta, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+
+				case "duration":
+					dur = int(v.IntValue())
+				case "contract-defs":
+					ticker = v.StringValue()
+					opts, err := aries.ParseOptions(ticker)
+
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+					ticker = strings.Join(opts, ",")
+
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Trailing_Stop_Pct, aries.OrderDuration(dur), 0, 0, 0, 0, taFl, 0)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
+				return
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
+
 		}
 	},
 }

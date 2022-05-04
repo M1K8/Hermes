@@ -405,7 +405,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				Options: []*discordgo.ApplicationCommandOption{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "contracts",
+						Name:        "contract-defs",
 						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
 						Required:    true,
 					},
@@ -456,7 +456,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				Options: []*discordgo.ApplicationCommandOption{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "contracts",
+						Name:        "contract-defs",
 						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
 						Required:    true,
 					},
@@ -501,7 +501,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				Options: []*discordgo.ApplicationCommandOption{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "contracts",
+						Name:        "contract-defs",
 						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
 						Required:    true,
 					},
@@ -552,7 +552,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				Options: []*discordgo.ApplicationCommandOption{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "contracts",
+						Name:        "contract-defs",
 						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
 						Required:    true,
 					},
@@ -609,7 +609,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				Options: []*discordgo.ApplicationCommandOption{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "contracts",
+						Name:        "contract-defs",
 						Description: "A SINGLE contract in the format XXX MM/DD/YYYY 123{P|C}  (/YYYY optional)",
 						Required:    true,
 					},
@@ -672,7 +672,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				Options: []*discordgo.ApplicationCommandOption{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "contracts",
+						Name:        "contract-defs",
 						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
 						Required:    true,
 					},
@@ -723,7 +723,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				Options: []*discordgo.ApplicationCommandOption{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "contracts",
+						Name:        "contract-defs",
 						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
 						Required:    true,
 					},

@@ -63,7 +63,7 @@ func main() {
 		log.SetOutput(multi)
 	}
 
-	s.LogLevel = discordgo.LogInformational
+	//s.LogLevel = discordgo.LogInformational
 
 	// We need information about servers (which includes their channels),
 	// messages and voice states.
