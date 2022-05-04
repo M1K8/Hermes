@@ -7,250 +7,765 @@ import (
 
 var Commands = []*discordgo.ApplicationCommand{
 	{
-		Name:        "gen-stock",
-		Description: "Generate a TradeAries link to the defined equity trade",
+		Name:        "stock",
+		Description: "Generate a direct link to a ticker with the supplied parameters",
 		Options: []*discordgo.ApplicationCommandOption{
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "ticker",
-				Description: "The stock you want the option to be based on",
-				Required:    true,
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionInteger,
-				Name:        "type",
-				Description: "Order Tyoe.",
-				Required:    false,
-				Choices: []*discordgo.ApplicationCommandOptionChoice{
+				Name:        "limit",
+				Description: "Limit order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
 					{
-						Name:  "Limit",
-						Value: aries.Limit,
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "ticker",
+						Description: "The stock you want the option to be based on.",
+						Required:    true,
 					},
 					{
-						Name:  "Market",
-						Value: aries.Market,
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "limit-price",
+						Description: "Limit Price.",
+						Required:    false,
 					},
 					{
-						Name:  "Bracket",
-						Value: aries.Bracket,
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "short",
+						Description: "Short.",
+						Required:    false,
 					},
 					{
-						Name:  "Stop_Market",
-						Value: aries.Stop_Market,
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
+						Required:    false,
 					},
 					{
-						Name:  "Stop_Limit",
-						Value: aries.Stop_Limit,
-					},
-					{
-						Name:  "Trailing_Stop",
-						Value: aries.Trailing_Stop,
-					},
-					{
-						Name:  "Trailing_Stop_Pct",
-						Value: aries.Trailing_Stop_Pct,
-					},
-				},
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionInteger,
-				Name:        "duration",
-				Description: "Order Duration.",
-				Required:    false,
-				Choices: []*discordgo.ApplicationCommandOptionChoice{
-					{
-						Name:  "UntilCancel",
-						Value: aries.UntilCancel,
-					},
-					{
-						Name:  "Day",
-						Value: aries.Day,
-					},
-					{
-						Name:  "Extended",
-						Value: aries.Extended,
-					},
-					{
-						Name:  "All_Hours",
-						Value: aries.All_Hours,
-					},
-					{
-						Name:  "Immediate",
-						Value: aries.Immediate,
-					},
-					{
-						Name:  "Fill_or_kill",
-						Value: aries.Fill_or_kill,
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
 					},
 				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "stop",
-				Description: "A stop loss that will expire the alert (this is currently non functional)",
-				Required:    false,
+				Name:        "market",
+				Description: "Market order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "ticker",
+						Description: "The stock you want the option to be based on.",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "t-stop",
-				Description: "A trailing stop loss amount that will expire the alert with the message STOP LOSS HIT",
-				Required:    false,
+				Name:        "stop-market",
+				Description: "Stop Market order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "ticker",
+						Description: "The stock you want the option to be based on.",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "stop-price",
+						Description: "Stop Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "t-stop-pct",
-				Description: "A trailing stop loss %% that will expire the alert with the message STOP LOSS HIT",
-				Required:    false,
+				Name:        "stop-limit",
+				Description: "Stop limit order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "ticker",
+						Description: "The stock you want the option to be based on.",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "stop-price",
+						Description: "Stop Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "limit-price",
+						Description: "Limit Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "p-limit",
-				Description: "Profit limit",
-				Required:    false,
+				Name:        "bracket",
+				Description: "Bracket order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "ticker",
+						Description: "The stock you want the option to be based on",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "limit-price",
+						Description: "Limit price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "profit-limit",
+						Description: "Profit Limit.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "stop-loss",
+						Description: "Stop Loss.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "l",
-				Description: "Price limit",
-				Required:    false,
+				Name:        "trailing-stop",
+				Description: "Trailing Stop.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "ticker",
+						Description: "The stock you want the option to be based on.",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "trail-amount",
+						Description: "Trail Amount.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
+			},
+			{
+				Name:        "trailing-percent",
+				Description: "Trailing Stop Percent.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "ticker",
+						Description: "The stock you want the option to be based on.",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "trail-percent",
+						Description: "Trail Percent.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 		},
 	},
+
 	{
-		Name:        "gen-options",
-		Description: "Generate a TradeAries link to the defined options trade",
+		Name:        "options",
+		Description: "Generate a direct link to one or more contracts with the supplied parameters",
 		Options: []*discordgo.ApplicationCommandOption{
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "ticker",
-				Description: "The stock you want the option to be based on",
-				Required:    true,
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "expiry",
-				Description: "The expiry of the contract. If the expiry is this year, then mm/dd. Else, mm/ddd/yy.",
-				Required:    true,
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "strike",
-				Description: "The strike price of the contract + the contract type, e.g. 140C, 55.50P",
-				Required:    true,
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "Buy Or Sell (Options)",
-				Description: "Whether to buy or sell the given contgract",
-				Required:    false,
-				Choices: []*discordgo.ApplicationCommandOptionChoice{
+				Name:        "limit",
+				Description: "Limit order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
 					{
-						Name:  "Buy",
-						Value: aries.Buy,
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "contracts",
+						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Required:    true,
 					},
 					{
-						Name:  "Sell",
-						Value: aries.Sell,
-					},
-				},
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionInteger,
-				Name:        "type",
-				Description: "Order Tyoe.",
-				Required:    false,
-				Choices: []*discordgo.ApplicationCommandOptionChoice{
-					{
-						Name:  "Limit",
-						Value: aries.Limit,
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "limit-price",
+						Description: "Limit Price.",
+						Required:    false,
 					},
 					{
-						Name:  "Market",
-						Value: aries.Market,
-					},
-					{
-						Name:  "Bracket",
-						Value: aries.Bracket,
-					},
-					{
-						Name:  "Stop_Market",
-						Value: aries.Stop_Market,
-					},
-					{
-						Name:  "Stop_Limit",
-						Value: aries.Stop_Limit,
-					},
-					{
-						Name:  "Trailing_Stop",
-						Value: aries.Trailing_Stop,
-					},
-					{
-						Name:  "Trailing_Stop_Pct",
-						Value: aries.Trailing_Stop_Pct,
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
 					},
 				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionInteger,
-				Name:        "duration",
-				Description: "Order Duration.",
-				Required:    false,
-				Choices: []*discordgo.ApplicationCommandOptionChoice{
+				Name:        "market",
+				Description: "Market order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
 					{
-						Name:  "UntilCancel",
-						Value: aries.UntilCancel,
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "contracts",
+						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Required:    true,
 					},
 					{
-						Name:  "Day",
-						Value: aries.Day,
-					},
-					{
-						Name:  "Extended",
-						Value: aries.Extended,
-					},
-					{
-						Name:  "All_Hours",
-						Value: aries.All_Hours,
-					},
-					{
-						Name:  "Immediate",
-						Value: aries.Immediate,
-					},
-					{
-						Name:  "Fill_or_kill",
-						Value: aries.Fill_or_kill,
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
 					},
 				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "stop",
-				Description: "A stop loss that will expire the alert (this is currently non functional)",
-				Required:    false,
+				Name:        "stop-market",
+				Description: "Stop Market order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "contracts",
+						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "stop-price",
+						Description: "Stop Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "t-stop",
-				Description: "A trailing stop loss amount that will expire the alert with the message STOP LOSS HIT",
-				Required:    false,
+				Name:        "stop-limit",
+				Description: "Stop limit order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "contracts",
+						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "stop-price",
+						Description: "Stop Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "limit-price",
+						Description: "Limit Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "t-stop-pct",
-				Description: "A trailing stop loss %% that will expire the alert with the message STOP LOSS HIT",
-				Required:    false,
+				Name:        "bracket",
+				Description: "Bracket order.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "contracts",
+						Description: "A SINGLE contract in the format XXX MM/DD/YYYY 123{P|C}  (/YYYY optional)",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "limit-price",
+						Description: "Limit price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "profit-limit",
+						Description: "Profit Limit.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "stop-loss",
+						Description: "Stop Loss.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "p-limit",
-				Description: "Profit limit",
-				Required:    false,
+				Name:        "trailing-stop",
+				Description: "Trailing Stop.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "contracts",
+						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "trail-amount",
+						Description: "Trail Amount.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "l",
-				Description: "Price limit",
-				Required:    false,
+				Name:        "trailing-percent",
+				Description: "Trailing Stop Percent.",
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "contracts",
+						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "trail-percent",
+						Description: "Trail Percent.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionInteger,
+						Name:        "duration",
+						Description: "Order Duration.",
+						Required:    false,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name:  "UntilCancel",
+								Value: aries.UntilCancel,
+							},
+							{
+								Name:  "Day",
+								Value: aries.Day,
+							},
+							{
+								Name:  "Extended",
+								Value: aries.Extended,
+							},
+							{
+								Name:  "All_Hours",
+								Value: aries.All_Hours,
+							},
+							{
+								Name:  "Immediate",
+								Value: aries.Immediate,
+							},
+							{
+								Name:  "Fill_or_kill",
+								Value: aries.Fill_or_kill,
+							},
+						},
+					},
+				},
 			},
 		},
 	},

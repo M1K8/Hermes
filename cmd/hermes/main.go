@@ -16,7 +16,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -30,12 +29,30 @@ import (
 var token string
 var s *discordgo.Session
 
-func main() {
-
-	if token == "" {
-		log.Println("No token provided. Please set it as the DISCORD_API environment variable")
-		return
+func init() {
+	var err error
+	token = "OTcxNTE4Mjc3MDczMzgzNDI0.YnLq5w.5T2S7TZSLlpcIlY0XUHdZzcZeYY"
+	s, err = discordgo.New("Bot " + token)
+	if err != nil {
+		log.Fatalf("Invalid bot parameters: %v", err)
 	}
+
+	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		switch i.Type {
+		//case discordgo.InteractionMessageComponent:
+		//	if h, ok := handlers.ComponentHandlers[i.MessageComponentData().CustomID]; ok {
+		//		h(s, i)
+		//	}
+
+		case discordgo.InteractionApplicationCommand:
+			if h, ok := handlers.CommandHandlers[i.ApplicationCommandData().Name]; ok {
+				h(s, i)
+			}
+		}
+	})
+}
+
+func main() {
 
 	// If the file doesn't exist, create it or append to the file
 	file, err := os.OpenFile("log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
@@ -46,9 +63,11 @@ func main() {
 		log.SetOutput(multi)
 	}
 
+	s.LogLevel = discordgo.LogInformational
+
 	// We need information about servers (which includes their channels),
 	// messages and voice states.
-	s.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates
+	s.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages
 
 	// Open the websocket and begin listening.
 	err = s.Open()
@@ -56,27 +75,12 @@ func main() {
 		log.Println("Error opening Discord session: ", err)
 		return
 	}
-
 	for _, v := range handlers.Commands {
-		c, err := s.ApplicationCommandCreate(s.State.User.ID, "", v)
+		_, err := s.ApplicationCommandCreate(s.State.User.ID, "", v)
 		if err != nil {
 			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
 		}
-
-		log.Println("Created " + c.Name)
-
-		defer func() {
-			//cleanup
-			cmds, _ := s.ApplicationCommands(s.State.User.ID, "")
-			for _, cmd := range cmds {
-				err = s.ApplicationCommandDelete(s.State.User.ID, "", cmd.ID)
-				if err != nil {
-					log.Println(fmt.Errorf("error removing %v: %w", cmd.Name, err))
-				} else {
-					log.Println("Removed " + cmd.Name)
-				}
-			}
-		}()
+		log.Println("Created " + v.Name)
 	}
 
 	log.Println("Ready!")

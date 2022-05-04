@@ -1,143 +1,74 @@
 package handlers
 
 import (
-	"log"
 	"strconv"
-	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/m1k8/hermes/pkg/aries"
 )
 
 var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-	"generate-stock": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		var (
-			ticker    string
-			pt        float64
-			stop      float64
-			tstop     float64
-			alertType int
-			err       error
-		)
-		argValMap := make(map[string]string)
-
-		for _, v := range i.ApplicationCommandData().Options {
-			if v.Name == "type" {
-				if v != nil {
-					alertType = int(v.IntValue())
-				}
-			} else {
-				argValMap[v.Name] = v.StringValue()
-			}
-		}
-
-		log.Println(alertType)
-		if v, ok := argValMap["ticker"]; !ok {
-			return
-		} else {
-			ticker = strings.ToUpper(v)
-		}
-		log.Println("Calling stock for " + ticker)
-		if v, ok := argValMap["pt"]; ok {
-			pt, err = strconv.ParseFloat(v, 64)
-			if err != nil {
-				pt = 0
-			}
-		}
-		if v, ok := argValMap["stop"]; ok {
-			stop, err = strconv.ParseFloat(v, 64)
-			if err != nil {
-				pt = 0
-			}
-		}
-		if v, ok := argValMap["t-stop"]; ok {
-			tstop, err = strconv.ParseFloat(v, 64)
-			if err != nil {
-				pt = 0
-			}
-		}
-
+	"stock": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		options := i.ApplicationCommandData().Options
 		gen := aries.NewAriesGenerator()
 
-		res, _ := gen.GetStockUrl(ticker, stop, tstop, pt)
+		// As you can see, names of subcommands (nested, top-level)
+		// and subcommand groups are provided through the arguments.
+		switch options[0].Name {
+		case "limit":
+			var (
+				ticker string
+				close  bool
+				lp     string
+				lpFl   float64
+				dur    int
+				short  bool
+				err    error
+			)
+			limitOpts := options[0].Options
 
-		log.Println(res)
-
-	},
-	"generate-options": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		var (
-			ticker     string
-			expiry     string
-			strike     float64
-			strikeType string
-			pt         float64
-			stop       float64
-			tstop      float64
-			alertType  int
-			err        error
-		)
-		argValMap := make(map[string]string)
-
-		for _, v := range i.ApplicationCommandData().Options {
-			if v.Name == "type" {
-				if v != nil {
-					alertType = int(v.IntValue())
+			for _, v := range limitOpts {
+				switch v.Name {
+				case "limit-price":
+					lp = v.StringValue()
+					lpFl, err = strconv.ParseFloat(lp, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "ticker":
+					ticker = v.StringValue()
+				case "short":
+					short = v.BoolValue()
+				case "close":
+					close = v.BoolValue()
 				}
-			} else {
-				argValMap[v.Name] = v.StringValue()
 			}
-		}
 
-		log.Println(alertType)
-		if v, ok := argValMap["ticker"]; !ok {
-			return
-		} else {
-			ticker = strings.ToUpper(v)
-		}
-		log.Println("Calling stock for " + ticker)
-		if v, ok := argValMap["expiry"]; !ok {
-			return
-		} else {
-			expiry = v
-		}
-
-		if v, ok := argValMap["strike"]; !ok {
-			return
-		} else {
-			strikePrice := v[:len(v)]
-			strike, err = strconv.ParseFloat(strikePrice, 64)
+			res, err := gen.GetStockUrl(ticker, short, aries.ContractBuyOrSell(!close), aries.Limit, aries.OrderDuration(dur), lpFl, 0, 0, 0, 0, 0)
 			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+					},
+				})
 				return
 			}
-			strikeType = v[len(v)-1:]
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: res,
+				},
+			})
 		}
-
-		if v, ok := argValMap["pt"]; ok {
-			pt, err = strconv.ParseFloat(v, 64)
-			if err != nil {
-				pt = 0
-			}
-		}
-		if v, ok := argValMap["stop"]; ok {
-			stop, err = strconv.ParseFloat(v, 64)
-			if err != nil {
-				pt = 0
-			}
-		}
-		if v, ok := argValMap["t-stop"]; ok {
-			tstop, err = strconv.ParseFloat(v, 64)
-			if err != nil {
-				pt = 0
-			}
-		}
-
-		gen := aries.NewAriesGenerator()
-
-		res, _ := gen.GetOptionsUrl(ticker, expiry, strikeType, strike, stop, tstop, pt)
-
-		embed := &discordgo.MessageEmbed{}
-
-		log.Println(res)
-
 	},
 }
