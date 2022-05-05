@@ -85,6 +85,18 @@ var Commands = []*discordgo.ApplicationCommand{
 						Required:    true,
 					},
 					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "short",
+						Description: "Short.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
+						Required:    false,
+					},
+					{
 						Type:        discordgo.ApplicationCommandOptionInteger,
 						Name:        "duration",
 						Description: "Order Duration.",
@@ -133,6 +145,18 @@ var Commands = []*discordgo.ApplicationCommand{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "stop-price",
 						Description: "Stop Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "short",
+						Description: "Short.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{
@@ -190,6 +214,18 @@ var Commands = []*discordgo.ApplicationCommand{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "limit-price",
 						Description: "Limit Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "short",
+						Description: "Short.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{
@@ -256,6 +292,18 @@ var Commands = []*discordgo.ApplicationCommand{
 						Required:    false,
 					},
 					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "short",
+						Description: "Short.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
+						Required:    false,
+					},
+					{
 						Type:        discordgo.ApplicationCommandOptionInteger,
 						Name:        "duration",
 						Description: "Order Duration.",
@@ -307,6 +355,18 @@ var Commands = []*discordgo.ApplicationCommand{
 						Required:    false,
 					},
 					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "short",
+						Description: "Short.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
+						Required:    false,
+					},
+					{
 						Type:        discordgo.ApplicationCommandOptionInteger,
 						Name:        "duration",
 						Description: "Order Duration.",
@@ -355,6 +415,18 @@ var Commands = []*discordgo.ApplicationCommand{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "trail-percent",
 						Description: "Trail Percent.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "short",
+						Description: "Short.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{
@@ -406,13 +478,19 @@ var Commands = []*discordgo.ApplicationCommand{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "contract-defs",
-						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Description: "A comma seperated list of 1 or more contracts, for example B AAPL 4/20 142.5C",
 						Required:    true,
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "limit-price",
 						Description: "Limit Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{
@@ -457,8 +535,14 @@ var Commands = []*discordgo.ApplicationCommand{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "contract-defs",
-						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Description: "A comma seperated list of 1 or more contracts, for example B AAPL 4/20 142.5C",
 						Required:    true,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
+						Required:    false,
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionInteger,
@@ -502,13 +586,19 @@ var Commands = []*discordgo.ApplicationCommand{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "contract-defs",
-						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Description: "A comma seperated list of 1 or more contracts, for example B AAPL 4/20 142.5C",
 						Required:    true,
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "stop-price",
 						Description: "Stop Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{
@@ -553,7 +643,7 @@ var Commands = []*discordgo.ApplicationCommand{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "contract-defs",
-						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Description: "A comma seperated list of 1 or more contracts, for example B AAPL 4/20 142.5C",
 						Required:    true,
 					},
 					{
@@ -566,6 +656,12 @@ var Commands = []*discordgo.ApplicationCommand{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "limit-price",
 						Description: "Limit Price.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{
@@ -610,7 +706,7 @@ var Commands = []*discordgo.ApplicationCommand{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "contract-defs",
-						Description: "A SINGLE contract in the format XXX MM/DD/YYYY 123{P|C}  (/YYYY optional)",
+						Description: "A single contract, for example B AAPL 4/20 142.5C; where B is buy (S for sell)",
 						Required:    true,
 					},
 					{
@@ -629,6 +725,12 @@ var Commands = []*discordgo.ApplicationCommand{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "stop-loss",
 						Description: "Stop Loss.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{
@@ -673,13 +775,19 @@ var Commands = []*discordgo.ApplicationCommand{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "contract-defs",
-						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Description: "A comma seperated list of 1 or more contracts, for example B AAPL 4/20 142.5C",
 						Required:    true,
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "trail-amount",
 						Description: "Trail Amount.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{
@@ -724,13 +832,19 @@ var Commands = []*discordgo.ApplicationCommand{
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "contract-defs",
-						Description: "A comma list in the format {B OR S} XXX MM/DD/YY 12.34{P OR C} (/YY optional)",
+						Description: "A comma seperated list of 1 or more contracts, for example B AAPL 4/20 142.5C",
 						Required:    true,
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "trail-percent",
 						Description: "Trail Percent.",
+						Required:    false,
+					},
+					{
+						Type:        discordgo.ApplicationCommandOptionBoolean,
+						Name:        "close",
+						Description: "Is this a close order?",
 						Required:    false,
 					},
 					{

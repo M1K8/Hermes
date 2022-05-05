@@ -31,7 +31,7 @@ var s *discordgo.Session
 
 func init() {
 	var err error
-	token = "OTcxNTE4Mjc3MDczMzgzNDI0.YnLq5w.5T2S7TZSLlpcIlY0XUHdZzcZeYY"
+	token = ""
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
 		log.Fatalf("Invalid bot parameters: %v", err)
@@ -39,10 +39,6 @@ func init() {
 
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		switch i.Type {
-		//case discordgo.InteractionMessageComponent:
-		//	if h, ok := handlers.ComponentHandlers[i.MessageComponentData().CustomID]; ok {
-		//		h(s, i)
-		//	}
 
 		case discordgo.InteractionApplicationCommand:
 			if h, ok := handlers.CommandHandlers[i.ApplicationCommandData().Name]; ok {
@@ -62,8 +58,6 @@ func main() {
 		multi := io.MultiWriter(file, os.Stdout)
 		log.SetOutput(multi)
 	}
-
-	//s.LogLevel = discordgo.LogInformational
 
 	// We need information about servers (which includes their channels),
 	// messages and voice states.

@@ -6,7 +6,16 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/m1k8/hermes/pkg/aries"
+	"github.com/m1k8/hermes/pkg/messages"
 )
+
+func getButton(res string) discordgo.Button {
+	return discordgo.Button{
+		Label: "Direct Trade Link",
+		Style: discordgo.LinkButton,
+		URL:   res,
+	}
+}
 
 var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 	"stock": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -38,6 +47,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -45,7 +55,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "ticker":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 				case "short":
 					short = v.BoolValue()
 				case "close":
@@ -59,17 +69,40 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			embed := messages.GetStockEmbed(close, i.Interaction.Member.Mention(), ticker, lp, "", "", "", "", "")
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
+
+			if err != nil {
+				panic(err)
+			}
 
 		case "market":
 			var (
@@ -86,7 +119,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "ticker":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 				case "short":
 					short = v.BoolValue()
 				case "close":
@@ -100,15 +133,33 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
+			embed := messages.GetStockEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", "", "")
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -134,6 +185,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -141,7 +193,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "ticker":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 				case "short":
 					short = v.BoolValue()
 				case "close":
@@ -155,15 +207,33 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
+			embed := messages.GetStockEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", stop, "", "")
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -191,6 +261,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -203,6 +274,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -210,7 +282,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "ticker":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 				case "short":
 					short = v.BoolValue()
 				case "close":
@@ -224,15 +296,33 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
+			embed := messages.GetStockEmbed(close, i.Interaction.Member.Mention(), ticker, lp, "", stop, "", "", "")
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -262,6 +352,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -274,6 +365,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -286,6 +378,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -293,7 +386,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "ticker":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 				case "short":
 					short = v.BoolValue()
 				case "close":
@@ -307,15 +400,33 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
+			embed := messages.GetStockEmbed(close, i.Interaction.Member.Mention(), ticker, lp, p, stop, "", "", "")
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -341,6 +452,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -349,7 +461,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "ticker":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 				case "short":
 					short = v.BoolValue()
 				case "close":
@@ -363,15 +475,33 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
+			embed := messages.GetStockEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", ta, "")
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -397,6 +527,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -405,7 +536,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "ticker":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 				case "short":
 					short = v.BoolValue()
 				case "close":
@@ -419,15 +550,33 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
+			embed := messages.GetStockEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", "", ta)
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -461,6 +610,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -468,7 +618,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "contract-defs":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 					opts, err := aries.ParseOptions(ticker)
 
 					if err != nil {
@@ -476,6 +626,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -493,15 +644,34 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, "", "", "", "", "")
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -519,7 +689,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "contract-defs":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 					opts, err := aries.ParseOptions(ticker)
 
 					if err != nil {
@@ -527,6 +697,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -544,15 +715,34 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", "", "")
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -577,6 +767,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -584,7 +775,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "contract-defs":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 					opts, err := aries.ParseOptions(ticker)
 
 					if err != nil {
@@ -592,6 +783,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -608,15 +800,34 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", stop, "", "")
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -643,6 +854,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -655,6 +867,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -662,7 +875,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "contract-defs":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 					opts, err := aries.ParseOptions(ticker)
 
 					if err != nil {
@@ -670,6 +883,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -686,15 +900,34 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, "", "", stop, "", "")
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -723,6 +956,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -735,6 +969,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -747,6 +982,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -754,25 +990,27 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "contract-defs":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 					opts, err := aries.ParseOptions(ticker)
 					if err != nil {
 						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
 					}
 
-					ticker, err = aries.ParseOption(opts[0])
+					ticker = opts[0]
 
 					if err != nil {
 						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -788,15 +1026,34 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, p, stop, "", "", "")
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -821,6 +1078,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -829,7 +1087,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "contract-defs":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 					opts, err := aries.ParseOptions(ticker)
 
 					if err != nil {
@@ -837,6 +1095,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -854,15 +1113,34 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", ta, "")
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
@@ -887,6 +1165,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -895,7 +1174,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				case "duration":
 					dur = int(v.IntValue())
 				case "contract-defs":
-					ticker = v.StringValue()
+					ticker = strings.ToUpper(v.StringValue())
 					opts, err := aries.ParseOptions(ticker)
 
 					if err != nil {
@@ -903,6 +1182,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 							Type: discordgo.InteractionResponseChannelMessageWithSource,
 							Data: &discordgo.InteractionResponseData{
 								Content: err.Error(),
+								Flags:   1 << 6,
 							},
 						})
 						return
@@ -920,15 +1200,34 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: err.Error(),
+						Flags:   1 << 6,
 					},
 				})
 				return
 			}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", "", ta)
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: res,
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
 				},
 			})
 
