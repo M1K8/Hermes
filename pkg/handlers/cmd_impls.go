@@ -496,7 +496,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				}
 			}
 
-			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Bracket, aries.OrderDuration(dur), lpFl, sFl, 0, 0, 0, pFl)
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Bracket_Pct, aries.OrderDuration(dur), lpFl, sFl, 0, 0, 0, pFl)
 			if err != nil {
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -1247,7 +1247,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				}
 			}
 
-			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Bracket, aries.OrderDuration(dur), lpFl, sFl, 0, 0, 0, pFl)
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Bracket_Pct, aries.OrderDuration(dur), lpFl, sFl, 0, 0, 0, pFl)
 			if err != nil {
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
