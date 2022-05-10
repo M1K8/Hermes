@@ -325,7 +325,6 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					},
 				},
 			})
-
 		case "bracket":
 			var (
 				ticker string
@@ -345,6 +344,109 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			for _, v := range bracketOpts {
 				switch v.Name {
 				case "limit-price":
+					lp = v.StringValue()
+					lpFl, err = strconv.ParseFloat(lp, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+								Flags:   1 << 6,
+							},
+						})
+						return
+					}
+				case "profit-limit":
+					p = v.StringValue()
+					pFl, err = strconv.ParseFloat(p, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+								Flags:   1 << 6,
+							},
+						})
+						return
+					}
+				case "stop-loss":
+					stop = v.StringValue()
+					sFl, err = strconv.ParseFloat(stop, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+								Flags:   1 << 6,
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "ticker":
+					ticker = strings.ToUpper(v.StringValue())
+				case "short":
+					short = v.BoolValue()
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetStockUrl(strings.ToUpper(ticker), short, aries.ContractBuyOrSell(!close), aries.Bracket, aries.OrderDuration(dur), lpFl, sFl, 0, 0, 0, pFl)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+						Flags:   1 << 6,
+					},
+				})
+				return
+			}
+
+			embed := messages.GetStockEmbed(close, i.Interaction.Member.Mention(), ticker, lp, p, stop, "", "", "")
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
+				},
+			})
+		case "bracket-pct":
+			var (
+				ticker string
+				close  bool
+				stop   string
+				sFl    float64
+				lp     string
+				lpFl   float64
+				p      string
+				pFl    float64
+				dur    int
+				short  bool
+				err    error
+			)
+			bracketOpts := options[0].Options
+
+			for _, v := range bracketOpts {
+				switch v.Name {
+				case "limit-pct":
 					lp = v.StringValue()
 					lpFl, err = strconv.ParseFloat(lp, 64)
 					if err != nil {
@@ -962,6 +1064,131 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 						return
 					}
 				case "profit-limit":
+					p = v.StringValue()
+					pFl, err = strconv.ParseFloat(p, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+								Flags:   1 << 6,
+							},
+						})
+						return
+					}
+				case "stop-loss":
+					stop = v.StringValue()
+					sFl, err = strconv.ParseFloat(stop, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+								Flags:   1 << 6,
+							},
+						})
+						return
+					}
+				case "duration":
+					dur = int(v.IntValue())
+				case "contract-defs":
+					ticker = strings.ToUpper(v.StringValue())
+					opts, err := aries.ParseOptions(ticker)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+								Flags:   1 << 6,
+							},
+						})
+						return
+					}
+
+					ticker = opts[0]
+
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+								Flags:   1 << 6,
+							},
+						})
+						return
+					}
+				case "close":
+					close = v.BoolValue()
+				}
+			}
+
+			res, err := gen.GetOptionsUrl(strings.ToUpper(ticker), aries.ContractBuyOrSell(!close), aries.Bracket, aries.OrderDuration(dur), lpFl, sFl, 0, 0, 0, pFl)
+			if err != nil {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: err.Error(),
+						Flags:   1 << 6,
+					},
+				})
+				return
+			}
+
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, p, stop, "", "", "")
+
+			indicator := "BTO"
+
+			if close {
+				indicator = "STC"
+			}
+
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: indicator,
+					Embeds: []*discordgo.MessageEmbed{
+						embed,
+					},
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								getButton(res),
+							},
+						},
+					},
+				},
+			})
+		case "bracket-pct":
+			var (
+				ticker string
+				close  bool
+				stop   string
+				sFl    float64
+				lp     string
+				lpFl   float64
+				p      string
+				pFl    float64
+				dur    int
+				err    error
+			)
+			bracketOpts := options[0].Options
+
+			for _, v := range bracketOpts {
+				switch v.Name {
+				case "limit-price":
+					lp = v.StringValue()
+					lpFl, err = strconv.ParseFloat(lp, 64)
+					if err != nil {
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: err.Error(),
+								Flags:   1 << 6,
+							},
+						})
+						return
+					}
+				case "limit-pct":
 					p = v.StringValue()
 					pFl, err = strconv.ParseFloat(p, 64)
 					if err != nil {

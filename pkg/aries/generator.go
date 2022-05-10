@@ -50,7 +50,8 @@ const (
 	Stop_Market       OrderType = 3
 	Stop_Limit        OrderType = 4
 	Trailing_Stop     OrderType = 5
-	Trailing_Stop_Pct OrderType = 6 //TODO - Verification based on the type
+	Trailing_Stop_Pct OrderType = 6
+	Bracket_Pct       OrderType = 7
 
 	// Params
 	order      = "order"
@@ -192,36 +193,38 @@ func (g *Generator) GetOptionsUrl(ticker string, buySell ContractBuyOrSell, orde
 
 	switch order_type {
 	case Limit:
-		oType = "&" + orderType + "0"
+		oType = "&" + orderType + fmt.Sprintf("%d", (Limit))
 	case Market:
-		oType = "&" + orderType + "1"
+		oType = "&" + orderType + fmt.Sprintf("%d", (Market))
 	case Bracket:
-		oType = "&" + orderType + "2"
+		oType = "&" + orderType + fmt.Sprintf("%d", (Bracket))
 	case Stop_Market:
-		oType = "&" + orderType + "3"
+		oType = "&" + orderType + fmt.Sprintf("%d", (Stop_Market))
 	case Stop_Limit:
-		oType = "&" + orderType + "4"
+		oType = "&" + orderType + fmt.Sprintf("%d", (Stop_Limit))
 	case Trailing_Stop:
-		oType = "&" + orderType + "5"
+		oType = "&" + orderType + fmt.Sprintf("%d", (Trailing_Stop))
 	case Trailing_Stop_Pct:
-		oType = "&" + orderType + "6"
+		oType = "&" + orderType + fmt.Sprintf("%d", (Trailing_Stop_Pct))
+	case Bracket_Pct:
+		oType = "&" + orderType + fmt.Sprintf("%d", (Bracket_Pct))
 	default:
 		oType = ""
 	}
 
 	switch duration {
 	case UntilCancel:
-		dur = "&" + orderDur + "0"
+		dur = "&" + orderDur + fmt.Sprintf("%d", (UntilCancel))
 	case Day:
-		dur = "&" + orderDur + "1"
+		dur = "&" + orderDur + fmt.Sprintf("%d", (Day))
 	case Extended:
-		dur = "&" + orderDur + "2"
+		dur = "&" + orderDur + fmt.Sprintf("%d", (Extended))
 	case All_Hours:
-		dur = "&" + orderDur + "3"
+		dur = "&" + orderDur + fmt.Sprintf("%d", (All_Hours))
 	case Immediate:
-		dur = "&" + orderDur + "4"
+		dur = "&" + orderDur + fmt.Sprintf("%d", (Immediate))
 	case Fill_or_kill:
-		dur = "&" + orderDur + "5"
+		dur = "&" + orderDur + fmt.Sprintf("%d", (Fill_or_kill))
 	default:
 		dur = ""
 	}
