@@ -155,7 +155,7 @@ func GetOptionsEmbed(close bool, alerter, con, limit, profit_limit, stop_loss, s
 			lFl, _ := strconv.ParseFloat(limit, 64)
 			pct := lFl * (1 + (pfFl / 100))
 			embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
-				Name:   "💹 Profit Limit: *__$" + profit_limit + " (" + fmt.Sprintf("%.2f", pct) + "%" + ")__*",
+				Name:   "💹 Profit Limit: *__%" + profit_limit + " ($" + fmt.Sprintf("%.2f", pct) + ")__*",
 				Value:  "-------------------------------",
 				Inline: false,
 			})
@@ -172,9 +172,9 @@ func GetOptionsEmbed(close bool, alerter, con, limit, profit_limit, stop_loss, s
 		if isPct {
 			pfFl, _ := strconv.ParseFloat(stop_loss, 64)
 			lFl, _ := strconv.ParseFloat(limit, 64)
-			pct := lFl * (1 + (pfFl / 100))
+			pct := lFl * (1 - (pfFl / 100))
 			embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
-				Name:   "📉 Stop Loss: *__$" + stop_loss + " (" + fmt.Sprintf("%.2f", pct) + "%" + ")__*",
+				Name:   "📉 Stop Loss: *__%" + stop_loss + " ($" + fmt.Sprintf("%.2f", pct) + ")__*",
 				Value:  "-------------------------------",
 				Inline: false,
 			})
