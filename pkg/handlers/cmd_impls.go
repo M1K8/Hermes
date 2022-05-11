@@ -446,7 +446,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 
 			for _, v := range bracketOpts {
 				switch v.Name {
-				case "limit-pct":
+				case "limit":
 					lp = v.StringValue()
 					lpFl, err = strconv.ParseFloat(lp, 64)
 					if err != nil {
@@ -459,7 +459,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 						})
 						return
 					}
-				case "profit-limit":
+				case "profit-pct":
 					p = v.StringValue()
 					pFl, err = strconv.ParseFloat(p, 64)
 					if err != nil {
@@ -1175,7 +1175,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 
 			for _, v := range bracketOpts {
 				switch v.Name {
-				case "limit-price":
+				case "limit":
 					lp = v.StringValue()
 					lpFl, err = strconv.ParseFloat(lp, 64)
 					if err != nil {
@@ -1188,7 +1188,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 						})
 						return
 					}
-				case "limit-pct":
+				case "profit-pct":
 					p = v.StringValue()
 					pFl, err = strconv.ParseFloat(p, 64)
 					if err != nil {
