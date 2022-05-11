@@ -428,7 +428,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					},
 				},
 			})
-		case "bracket_pct":
+		case "bracket-pct":
 			var (
 				ticker string
 				close  bool
@@ -1158,7 +1158,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					},
 				},
 			})
-		case "bracket_pct":
+		case "bracket-pct":
 			var (
 				ticker string
 				close  bool
