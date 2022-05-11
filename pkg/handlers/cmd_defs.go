@@ -464,7 +464,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				},
 			},
 			{
-				Name:        "bracket_pct",
+				Name:        "bracket-pct",
 				Description: "Bracket order based on percentages",
 				Type:        discordgo.ApplicationCommandOptionSubCommand,
 				Options: []*discordgo.ApplicationCommandOption{
@@ -482,8 +482,8 @@ var Commands = []*discordgo.ApplicationCommand{
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "limit-pct",
-						Description: "Limit percentage gain.",
+						Name:        "limit",
+						Description: "Profit limit.",
 						Required:    false,
 					},
 					{
@@ -843,7 +843,7 @@ var Commands = []*discordgo.ApplicationCommand{
 				},
 			},
 			{
-				Name:        "bracket_pct",
+				Name:        "bracket-pct",
 				Description: "Bracket order based on percentages",
 				Type:        discordgo.ApplicationCommandOptionSubCommand,
 				Options: []*discordgo.ApplicationCommandOption{
@@ -855,14 +855,14 @@ var Commands = []*discordgo.ApplicationCommand{
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "limit-pct",
-						Description: "Limit percentage gain.",
+						Name:        "limit",
+						Description: "Limit price.",
 						Required:    false,
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "profit-limit",
-						Description: "Profit Limit.",
+						Name:        "profit-pct",
+						Description: "Profit pct.",
 						Required:    false,
 					},
 					{
