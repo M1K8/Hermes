@@ -488,12 +488,6 @@ var Commands = []*discordgo.ApplicationCommand{
 					},
 					{
 						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "profit-limit",
-						Description: "Profit Limit.",
-						Required:    false,
-					},
-					{
-						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "stop-loss",
 						Description: "Stop Loss (%).",
 						Required:    false,
@@ -857,12 +851,6 @@ var Commands = []*discordgo.ApplicationCommand{
 						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "limit-pct",
 						Description: "Limit percentage gain.",
-						Required:    false,
-					},
-					{
-						Type:        discordgo.ApplicationCommandOptionString,
-						Name:        "profit-limit",
-						Description: "Profit Limit.",
 						Required:    false,
 					},
 					{
