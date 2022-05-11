@@ -1,6 +1,8 @@
 package messages
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -119,7 +121,7 @@ func GetStockEmbed(close bool, alerter, ticker, limit, profit_limit, stop_loss, 
 	return embed
 }
 
-func GetOptionsEmbed(close bool, alerter, con, limit, profit_limit, stop_loss, stop_price, trail_amt, trail_pct string) *discordgo.MessageEmbed {
+func GetOptionsEmbed(close bool, alerter, con, limit, profit_limit, stop_loss, stop_price, trail_amt, trail_pct string, isPct bool) *discordgo.MessageEmbed {
 	var colour int
 	if close {
 		colour = 0xff0000
@@ -148,19 +150,41 @@ func GetOptionsEmbed(close bool, alerter, con, limit, profit_limit, stop_loss, s
 	}
 
 	if profit_limit != "" {
-		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
-			Name:   "💹 Profit Limit: *__$" + profit_limit + "__*",
-			Value:  "-------------------------------",
-			Inline: false,
-		})
+		if isPct {
+			pfFl, _ := strconv.ParseFloat(profit_limit, 64)
+			lFl, _ := strconv.ParseFloat(limit, 64)
+			pct := lFl * (1 + (pfFl / 100))
+			embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
+				Name:   "💹 Profit Limit: *__$" + profit_limit + " (" + fmt.Sprintf("%.2f", pct) + "%" + ")__*",
+				Value:  "-------------------------------",
+				Inline: false,
+			})
+		} else {
+			embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
+				Name:   "💹 Profit Limit: *__$" + profit_limit + "__*",
+				Value:  "-------------------------------",
+				Inline: false,
+			})
+		}
 	}
 
 	if stop_loss != "" {
-		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
-			Name:   "📉 Stop Loss: *__$" + stop_loss + "__*",
-			Value:  "-------------------------------",
-			Inline: false,
-		})
+		if isPct {
+			pfFl, _ := strconv.ParseFloat(stop_loss, 64)
+			lFl, _ := strconv.ParseFloat(limit, 64)
+			pct := lFl * (1 + (pfFl / 100))
+			embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
+				Name:   "📉 Stop Loss: *__$" + stop_loss + " (" + fmt.Sprintf("%.2f", pct) + "%" + ")__*",
+				Value:  "-------------------------------",
+				Inline: false,
+			})
+		} else {
+			embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
+				Name:   "📉 Stop Limit: *__$" + stop_loss + "__*",
+				Value:  "-------------------------------",
+				Inline: false,
+			})
+		}
 	}
 
 	if stop_price != "" {

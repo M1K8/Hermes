@@ -752,7 +752,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				return
 			}
 
-			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, "", "", "", "", "")
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, "", "", "", "", "", false)
 
 			indicator := "BTO"
 
@@ -823,7 +823,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				return
 			}
 
-			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", "", "")
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", "", "", false)
 
 			indicator := "BTO"
 
@@ -908,7 +908,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				return
 			}
 
-			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", stop, "", "")
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", stop, "", "", false)
 
 			indicator := "BTO"
 
@@ -1008,7 +1008,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				return
 			}
 
-			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, "", "", stop, "", "")
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, "", "", stop, "", "", false)
 
 			indicator := "BTO"
 
@@ -1134,7 +1134,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				return
 			}
 
-			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, p, stop, "", "", "")
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, p, stop, "", "", "", false)
 
 			indicator := "BTO"
 
@@ -1259,7 +1259,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				return
 			}
 
-			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, p, stop, "", "", "")
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, lp, p, stop, "", "", "", true)
 
 			indicator := "BTO"
 
@@ -1346,7 +1346,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				return
 			}
 
-			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", ta, "")
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", ta, "", false)
 
 			indicator := "BTO"
 
@@ -1433,7 +1433,7 @@ var CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				return
 			}
 
-			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", "", ta)
+			embed := messages.GetOptionsEmbed(close, i.Interaction.Member.Mention(), ticker, "", "", "", "", "", ta, false)
 
 			indicator := "BTO"
 
